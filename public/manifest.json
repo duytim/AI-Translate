@@ -1,0 +1,19 @@
+{
+  "name": "AI Translator Pro",
+  "short_name": "Translator",
+  "description": "AI Translator for Chinese, Korean, Japanese and English",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#111827",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/4534/4534766.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

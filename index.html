@@ -4,6 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>AI Translator Pro</title>
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#2563eb" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="AI Translator" />
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/4534/4534766.png" />
   <script>tailwind = { config: { darkMode: 'class' } };</script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -12,72 +19,155 @@
     ::-webkit-scrollbar { display: none; }
     body { -ms-overflow-style: none; scrollbar-width: none; }
     textarea { resize: none; }
+
+    /* Safe area for notches and status bars */
+    html,
+    body {
+      overscroll-behavior: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    /* Skeleton loading animation */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .animate-pulse {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    /* Toast animations */
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(100%);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes slideOutRight {
+      from {
+        opacity: 1;
+        transform: translateX(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateX(100%);
+      }
+    }
+
+    .animate-in {
+      animation: slideInRight 0.3s ease-out;
+    }
+
+    .animate-out {
+      animation: slideOutRight 0.3s ease-out;
+    }
   </style>
 </head>
 <body class="bg-[#1e1e1e] text-white min-h-screen flex flex-col font-sans relative transition-colors duration-300 dark:bg-[#1e1e1e] dark:text-white bg-gray-50 text-gray-900">
-  
-  <header class="flex justify-between items-center p-4 text-gray-400 dark:text-gray-300">
+
+  <!-- Header -->
+  <header class="flex justify-between items-center p-4 text-gray-400 dark:text-gray-300 border-b border-gray-200 dark:border-gray-800">
     <div class="flex items-center gap-4">
-      <button class="text-xl hover:text-black dark:hover:text-white"><i class="fa-solid fa-chevron-left"></i> Trang chủ</button>
+      <h1 class="text-lg font-semibold text-gray-900 dark:text-white">AI Translator</h1>
     </div>
     <div class="flex items-center gap-6 text-xl">
-      <button id="historyBtn" class="hover:text-black dark:hover:text-white transition"><i class="fa-solid fa-clock-rotate-left"></i></button>
-      <button id="settingsBtn" class="hover:text-black dark:hover:text-white transition"><i class="fa-solid fa-gear"></i></button>
+      <button id="historyBtn" class="hover:text-black dark:hover:text-white transition" title="Lịch sử">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+      </button>
+      <button id="settingsBtn" class="hover:text-black dark:hover:text-white transition" title="Cài đặt">
+        <i class="fa-solid fa-gear"></i>
+      </button>
     </div>
   </header>
 
+  <!-- Main Content -->
   <main class="flex-1 overflow-y-auto pb-32 px-5">
-    
+
+    <!-- Input Section -->
     <div class="mb-4 relative">
       <div id="sourceLangLabel" class="text-sm text-blue-500 dark:text-blue-400 mb-2 font-medium">Việt</div>
-      <textarea id="inputText" rows="4" class="w-full bg-transparent outline-none text-3xl font-normal placeholder-gray-400 dark:placeholder-gray-500 leading-tight" placeholder="Nhập văn bản..."></textarea>
-      
+      <textarea
+        id="inputText"
+        rows="4"
+        class="w-full bg-transparent outline-none text-3xl font-normal placeholder-gray-400 dark:placeholder-gray-500 leading-tight"
+        placeholder="Nhập văn bản...">
+      </textarea>
+
       <div class="flex justify-between items-center mt-2 text-gray-500 dark:text-gray-400">
-        <button id="ttsOriginal" class="p-2 text-xl hover:text-blue-500 transition hidden"><i class="fa-solid fa-volume-high"></i></button>
+        <button id="ttsOriginal" class="p-2 text-xl hover:text-blue-500 transition hidden" title="Phát âm gốc">
+          <i class="fa-solid fa-volume-high"></i>
+        </button>
         <div class="flex gap-4 ml-auto">
-            <button id="micBtn" class="p-2 text-xl hover:text-red-500 transition"><i class="fa-solid fa-microphone"></i></button>
-            <button id="clearBtn" class="p-2 text-xl hover:text-gray-800 dark:hover:text-white transition hidden"><i class="fa-solid fa-xmark"></i></button>
+          <button id="micBtn" class="p-2 text-xl hover:text-red-500 transition" title="Nhập giọng nói">
+            <i class="fa-solid fa-microphone"></i>
+          </button>
+          <button id="clearBtn" class="p-2 text-xl hover:text-gray-800 dark:hover:text-white transition hidden" title="Xóa">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
         </div>
       </div>
     </div>
 
-    <div class="w-1/4 h-[2px] bg-blue-500 rounded-full my-6 opacity-80" id="divider"></div>
+    <!-- Divider -->
+    <div class="w-1/4 h-[2px] bg-blue-500 rounded-full my-6 opacity-80"></div>
 
+    <!-- Output Section -->
     <div id="outputPanel" class="hidden relative pb-10">
       <div id="targetLangLabel" class="text-sm text-blue-500 dark:text-blue-400 mb-2 font-medium">Trung (Giản thể)</div>
-      
-      <div id="loadingIndicator" class="hidden text-gray-500 dark:text-gray-400 animate-pulse text-xl font-medium">Đang dịch...</div>
-      
+
+      <div id="loadingIndicator" class="text-gray-500 dark:text-gray-400">
+        <!-- Skeleton loading will be inserted here -->
+      </div>
+
       <div id="resultContent" class="hidden">
-          <div id="outTranslation" class="text-3xl font-normal leading-tight text-gray-900 dark:text-white mb-2 selection:bg-blue-200 dark:selection:bg-blue-800"></div>
-          <div id="outPhonetic" class="text-lg text-gray-500 dark:text-gray-400 mb-4 font-normal"></div>
-          
-          <div class="flex justify-between items-center text-gray-500 dark:text-gray-400">
-            <button id="ttsTranslation" class="p-2 text-xl hover:text-blue-500 transition"><i class="fa-solid fa-volume-high"></i></button>
-            <div class="flex gap-4">
-                <button id="copyBtn" class="p-2 text-xl hover:text-blue-500 transition"><i class="fa-regular fa-copy"></i></button>
-            </div>
+        <div id="outTranslation" class="text-3xl font-normal leading-tight text-gray-900 dark:text-white mb-2 selection:bg-blue-200 dark:selection:bg-blue-800"></div>
+        <div id="outPhonetic" class="text-lg text-gray-500 dark:text-gray-400 mb-4 font-normal"></div>
+
+        <div class="flex justify-between items-center text-gray-500 dark:text-gray-400">
+          <button id="ttsTranslation" class="p-2 text-xl hover:text-blue-500 transition" title="Phát âm dịch">
+            <i class="fa-solid fa-volume-high"></i>
+          </button>
+          <div class="flex gap-4">
+            <button id="copyBtn" class="p-2 text-xl hover:text-blue-500 transition" title="Sao chép">
+              <i class="fa-regular fa-copy"></i>
+            </button>
           </div>
+        </div>
       </div>
     </div>
   </main>
 
-  <div id="newTranslationBtn" class="fixed bottom-24 right-5 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-2xl shadow-lg flex items-center gap-2 font-medium text-lg transition-transform transform hidden cursor-pointer z-10">
+  <!-- New Translation Button -->
+  <div id="newTranslationBtn" class="fixed bottom-24 right-5 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-2xl shadow-lg flex items-center gap-2 font-medium text-lg transition-transform transform hidden cursor-pointer z-10 active:scale-95">
     <i class="fa-solid fa-plus"></i> Bản dịch mới
   </div>
 
+  <!-- Bottom Language Selector -->
   <div class="fixed bottom-0 w-full bg-white dark:bg-[#121212] flex justify-between items-center p-3 px-6 rounded-t-3xl shadow-[0_-4px_20px_rgba(0,0,0,0.1)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.3)] z-20">
-    <select id="sourceLang" class="bg-transparent text-gray-900 dark:text-white font-medium text-lg outline-none appearance-none text-center w-28">
+    <select id="sourceLang" class="bg-transparent text-gray-900 dark:text-white font-medium text-lg outline-none appearance-none text-center w-28 cursor-pointer">
       <option value="auto" class="text-black">Phát hiện</option>
       <option value="vi" class="text-black" selected>Việt</option>
       <option value="en" class="text-black">Anh</option>
+      <option value="zh" class="text-black">Trung</option>
+      <option value="ko" class="text-black">Hàn</option>
+      <option value="ja" class="text-black">Nhật</option>
     </select>
-    
-    <button id="swapLangBtn" class="p-3 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-white transition bg-gray-100 dark:bg-gray-800 rounded-full w-12 h-12 flex items-center justify-center">
+
+    <button id="swapLangBtn" class="p-3 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition bg-gray-100 dark:bg-gray-800 rounded-full w-12 h-12 flex items-center justify-center cursor-pointer" title="Đổi ngôn ngữ">
       <i class="fa-solid fa-arrow-right-arrow-left"></i>
     </button>
-    
-    <select id="targetLang" class="bg-transparent text-gray-900 dark:text-white font-medium text-lg outline-none appearance-none text-center w-28">
+
+    <select id="targetLang" class="bg-transparent text-gray-900 dark:text-white font-medium text-lg outline-none appearance-none text-center w-28 cursor-pointer">
       <option value="zh" class="text-black" selected>Trung</option>
       <option value="ko" class="text-black">Hàn</option>
       <option value="ja" class="text-black">Nhật</option>
@@ -86,18 +176,55 @@
     </select>
   </div>
 
+  <!-- Settings Modal -->
   <div id="settingsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-[#1e1e1e] w-full max-w-sm rounded-2xl shadow-2xl p-6 relative">
-      <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Cài đặt</h3>
+    <div class="bg-white dark:bg-[#1e1e1e] w-full max-w-sm rounded-2xl shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white">Cài đặt</h3>
+        <button id="closeSettingsBtn" class="text-gray-500 hover:text-gray-900 dark:hover:text-white text-xl">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
       <div class="space-y-5">
         <div>
-          <label class="block text-sm text-gray-500 dark:text-gray-400 mb-2">Mô hình AI</label>
-          <select id="modelSelect" class="w-full bg-gray-100 dark:bg-[#2a2a2a] text-gray-900 dark:text-white p-3 rounded-xl outline-none appearance-none">
+          <label class="block text-sm text-gray-500 dark:text-gray-400 mb-2 font-medium">Mô hình AI</label>
+          <select id="modelSelect" class="w-full bg-gray-100 dark:bg-[#2a2a2a] text-gray-900 dark:text-white p-3 rounded-xl outline-none appearance-none cursor-pointer">
             <option value="google/gemma-4-31b-it:free">Gemma 4 31B</option>
             <option value="z-ai/glm-4.5-air:free">GLM 4.5 Air</option>
             <option value="qwen/qwen3-next-80b-a3b-instruct:free">Qwen3 80B</option>
           </select>
         </div>
+
+        <div>
+          <div class="flex justify-between items-center bg-gray-100 dark:bg-[#2a2a2a] p-3 rounded-xl">
+            <span class="text-gray-900 dark:text-white font-medium">Giao diện tối</span>
+            <input type="checkbox" id="themeToggle" class="w-5 h-5 accent-blue-600 cursor-pointer">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- History Modal -->
+  <div id="historyModal" class="hidden fixed inset-0 bg-white dark:bg-[#1e1e1e] z-50 flex flex-col max-h-screen">
+    <div class="p-4 flex justify-between items-center border-b border-gray-200 dark:border-gray-800">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+        <i class="fa-solid fa-clock-rotate-left mr-2"></i>Lịch sử
+      </h3>
+      <div class="flex gap-4">
+        <button id="clearHistoryBtn" class="text-red-500 hover:text-red-600 font-medium transition hidden">Xóa hết</button>
+        <button id="closeHistoryBtn" class="text-gray-500 hover:text-gray-900 dark:hover:text-white text-xl transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+    <div id="historyList" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
         <div class="flex justify-between items-center bg-gray-100 dark:bg-[#2a2a2a] p-3 rounded-xl">
           <span class="text-gray-900 dark:text-white">Giao diện tối</span>
           <input type="checkbox" id="themeToggle" class="w-5 h-5 accent-blue-600">
